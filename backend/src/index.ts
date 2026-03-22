@@ -8,7 +8,9 @@ import path from "path";
 export const app: Application = express();
 
 const server = createServer(app);
-export const io = new Server(server)
+export const io = new Server(server, {
+  cors: { origin: "*" },
+});
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -19,6 +21,5 @@ app.use(express.static(path.join(__dirname,"public")));
 app.use(cors({
     origin: "*", credentials: true
 }))
-console.log()
 
 export default server;
