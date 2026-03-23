@@ -2,16 +2,25 @@ import { Request, Response, NextFunction } from "express";
 import jwtUtils from "../utils/jwt.utils.js";
 import CustomError from "../utils/customerError.utils.js";
 
-export interface UserRequest extends Request {
-    userId?: string;  // Optional banayein kyunki middleware ke pehle yeh exist nahi karta
-    user?: {
-        id: string;
-        email?: string;
-        role?: string;
-    }; // Advanced: Poora user data store kar sakte hain
+// export interface UserRequest extends Request {
+//     userId?: string;  // Optional banayein kyunki middleware ke pehle yeh exist nahi karta
+//     user?: {
+//         id: string;
+//         email?: string;
+//         role?: string;
+//     }; // Advanced: Poora user data store kar sakte hain
+// }
+declare global {
+    namespace Express {
+        interface Request {
+            userId?: string;
+            // user?: JwtPayload;
+        }
+    }
 }
 
-const authMiddleware = (req: UserRequest, res: Response, next: NextFunction): void => {
+
+const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
     try {
         // Token ko cookies se ya header se le sakte hain
         let token = req.cookies?.token;
