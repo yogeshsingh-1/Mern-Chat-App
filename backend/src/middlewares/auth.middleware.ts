@@ -24,7 +24,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction): void =
     try {
         // Token ko cookies se ya header se le sakte hain
         let token = req.cookies?.token;
-
+        console.log(token)
         // Agar cookie mein nahi milta to Authorization header check karein
         if (!token) {
             const authHeader = req.headers.authorization;
@@ -32,16 +32,14 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction): void =
                 token = authHeader.split(" ")[1];
             }
         }
-
-        console.log("Token received:", token ? "Present" : "Missing");
-
+        // console.log("Token received:", token ? "Present" : "Missing");
         if (!token) {
             throw new CustomError(401, "Unauthorized: No token provided");
         }
 
         // Verify token
         const jwtData = jwtUtils.verifyToken(token);
-
+        // console.log("hi", jwtData)
         // Type guard: Ensure jwtData has id property
         if (!jwtData || typeof jwtData === 'string') {
             throw new CustomError(401, "Unauthorized: Invalid token format");
@@ -50,17 +48,9 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction): void =
         // Attach user ID to request
         req.userId = jwtData.id;
 
-        // Optional: Attach complete user data
-        // req.user = {
-        //     id: jwtData.id,
-        //     email: (jwtData as any).email,
-        //     role: (jwtData as any).role
-        // };
-
         next();
     } catch (error) {
-        // Pass error to error handling middleware
-        next(error);
+        return next(error);
     }
 };
 

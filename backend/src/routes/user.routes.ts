@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction, Router } from "express"
 import UserController from "../controller/user.controller.js";
-import User from "../models/user.model.js";
-const router: Router = Router();
+
+const userRouter: Router = Router();
 const userController = new UserController();
-router.post("/auth/login", userController.userLogin);
-router.post("/auth/signup", userController.userSignup);
-export default router;
+// findAllUser
+userRouter.get("/user/all", userController.findAllUsers)
+// getUserById
+userRouter.get("/user/:id", userController.userById)
+export default userRouter;

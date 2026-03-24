@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import envDetailsUtils from "../utils/envDetails.utils.js";
 const connectToDB = async (): Promise<void> => {
     try {
-        await mongoose.connect(envDetailsUtils.MONGO_URI, { dbName: "chat" });
+        await mongoose.connect(envDetailsUtils.MONGO_URI, { dbName: "chat-app" });
         console.log(`MongoDB Connected: ${mongoose.connection.host}`);
         mongoose.connection.on("connected", () => {
             console.log("Mongoose connected");

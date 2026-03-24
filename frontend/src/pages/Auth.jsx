@@ -5,7 +5,6 @@ import { Login, Signup } from "../pages";
 const Auth = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  console.log(location);
   const activeTab = location.pathname.includes("signup") ? "signup" : "login";
 
   const activeStyle =

@@ -1,26 +1,32 @@
-import { Children, createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import Axios from "../utils/axiox.utils";
+
 export const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [authState, setAuthState] = useState("loading");
-  const verifyAuth = async () => {
+  const verifyUser = async () => {
     try {
-      const { data } = await Axios.get("/api/v1/verify-token");
-      setAuthState(data.status ? "valid" : "invalid");
-      if (data.staus) {
-        localStorage.setItem("id", data.userId);
+      const { data } = await Axios.get("/api/v1/verify/verify-token");
+      if (data.success) {
+        setAuthState("valid");
+      } else {
+        setAuthState("invalid");
       }
-    } catch (E) {
+    } catch (e) {
+      console.log("Error Response:", e.response);
       setAuthState("invalid");
     }
   };
   useEffect(() => {
-    verifyAuth();
+    verifyUser();
   }, []);
+
   return (
     <AuthContext.Provider value={{ authState, setAuthState }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+export default AuthProvider;

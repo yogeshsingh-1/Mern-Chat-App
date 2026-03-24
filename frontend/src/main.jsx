@@ -4,6 +4,9 @@ import "./index.css";
 // initialize routerProvider
 import { RouterProvider } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
+import AuthProvider from "./auth/AuthContext";
 createRoot(document.getElementById("root")).render(
-  <RouterProvider router={AppRoutes} />,
+  <AuthProvider>
+    <RouterProvider router={AppRoutes} />
+  </AuthProvider>,
 );

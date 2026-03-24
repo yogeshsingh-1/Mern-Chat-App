@@ -4,7 +4,7 @@ import IUser from "../interface/user.interface.js";
 const userSchema = new mongoose.Schema<IUser>(
     {
         name: { type: String, required: true },
-        username: { type: String, required: true, unique: true },
+        email: { type: String, required: true, unique: true },
         password: { type: String, required: true, select: false },
     },
     {
@@ -20,14 +20,14 @@ const userSchema = new mongoose.Schema<IUser>(
                 return obj;
             },
         },
-
         toObject: {
             transform(doc, ret) {
-                // delete ret.password;
-                // delete ret.__v;
-                // ret.id = ret._id;
-                // delete ret._id;
-                // return ret;
+                const obj = ret as any;
+                delete obj.password;
+                delete obj.__v;
+                obj.id = obj._id;
+                delete obj._id;
+                return obj;
             },
         },
     }

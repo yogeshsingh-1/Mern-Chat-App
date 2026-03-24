@@ -9,10 +9,9 @@ const errorHandleMiddleware = (
     const statusCode = error.status || 500;
     const message = error.message || "Internal Server Error";
     console.log(message)
-    res.status(statusCode).json({
+    return res.status(statusCode).json({
         success: false,
         message,
-        stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
     });
 };
 

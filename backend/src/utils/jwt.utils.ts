@@ -16,8 +16,11 @@ class JWTUtils {
 
     public verifyToken = (token: string): jwtData => {
         try {
-            return jwt.verify(token, envDetailsUtils.JWT_SECRET) as jwtData;
+            const jwtData = jwt.verify(token, envDetailsUtils.JWT_SECRET) as jwtData;
+
+            return jwtData;
         } catch (error) {
+            console.log("hi", error)
             throw new CustomError(401, "Invalid or expired token");
         }
     }

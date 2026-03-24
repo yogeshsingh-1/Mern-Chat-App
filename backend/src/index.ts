@@ -11,15 +11,17 @@ export const app: Application = express();
 const server = createServer(app);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const io = new Server(server, {
-  cors: { origin: "*" },
+  cors: { origin: "http://localhost:5173", credentials: true, },
 });
 connectToDB();
 // middleware
+app.use(cors({
+  origin: "http://localhost:5173", credentials: true, methods: ["GET", "POST", "PATCH", "DELETE"], allowedHeaders: ['Content-Type', 'Authorization']
+}))
+app.options("*", cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
-app.use(cors({
-  origin: "*", credentials: true
-}))
+
 app.use(cookieParser())
 export default server;
