@@ -9,9 +9,9 @@ class UserController {
         try {
             const user: IUser[] | null = await User.find({});
             if (!user) {
-                return res.status(200).json({ status: true, data: [] })
+                return res.status(200).json({ success: true, data: [] })
             }
-            return res.status(200).json({ status: true, data: user });
+            return res.status(200).json({ success: true, data: user });
         } catch (e) {
             return next(e)
         }
@@ -29,9 +29,9 @@ class UserController {
             }
             const user: IUser | null = await User.findOne({ _id: id });
             if (!user) {
-                return res.status(200).json({ status: true, data: null })
+                return res.status(200).json({ success: true, data: null })
             }
-            return res.status(200).json({ status: true, data: user });
+            return res.status(200).json({ success: true, data: user });
         } catch (e) {
             return next(e)
         }

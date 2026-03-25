@@ -26,7 +26,7 @@ class AuthController {
             const token = JWTUtils.getToken({ id: user._id });
             res.cookie("token", token, cookieOption)
             return res.status(201).json({
-                status: true,
+                success: true,
                 message: "User created successfully",
                 userId: user._id, token,
             });
@@ -61,7 +61,7 @@ class AuthController {
             );
             res.cookie("token", token, cookieOption)
             return res.status(200).json({
-                status: true,
+                success: true,
                 message: "Login successful",
                 token,
             });
@@ -69,15 +69,13 @@ class AuthController {
             return next(e);
         }
     };
-    public findAllUsers = async (req: Request, res: Response, next: NextFunction) => {
+    //   Logout
+    public userLogout = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const user: IUser[] | null = await User.find({});
-            if (!user) {
-                return res.status(200).json({ status: true, data: [] })
-            }
-            return res.status(200).json({ status: true, data: user });
+            res.clearCookie("token", cookieOption)
+            return res.status(200).json({ success: true, message: "Logout Succesfully" })
         } catch (e) {
-            next(e)
+            return next(e);
         }
     }
 }

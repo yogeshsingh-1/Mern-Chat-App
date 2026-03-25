@@ -8,5 +8,5 @@ authRouter.post("/auth/signup", authController.userSignup);
 // signin
 authRouter.post("/auth/login", authController.userLogin);
 // logout
-authRouter.post("/auth/logout", authController.userSignup);
+authRouter.get("/auth/logout", authController.userLogout);
 export default authRouter;

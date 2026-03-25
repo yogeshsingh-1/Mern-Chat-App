@@ -17,7 +17,7 @@ const Auth = () => {
       <div className="px-5 py-2 grid grid-cols-2 bg-blue-500">
         <button
           className={activeTab === "login" ? activeStyle : inActiveStyle}
-          onClick={() => navigate("/auth/login")}
+          onClick={() => navigate("/auth")}
         >
           Login
         </button>

@@ -5,8 +5,10 @@ export const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [authState, setAuthState] = useState("loading");
+  debugger;
   const verifyUser = async () => {
     try {
+      debugger;
       const { data } = await Axios.get("/api/v1/verify/verify-token");
       if (data.success) {
         setAuthState("valid");
@@ -14,7 +16,7 @@ const AuthProvider = ({ children }) => {
         setAuthState("invalid");
       }
     } catch (e) {
-      console.log("Error Response:", e.response);
+      console.log("Error Response:", e?.response);
       setAuthState("invalid");
     }
   };
@@ -23,7 +25,7 @@ const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ authState, setAuthState }}>
+    <AuthContext.Provider value={{ authState, setAuthState, verifyUser }}>
       {children}
     </AuthContext.Provider>
   );

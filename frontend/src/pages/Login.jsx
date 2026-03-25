@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Button, TextField } from "@mui/material";
 import Axios from "../utils/axiox.utils";
+import { AuthContext } from "../auth/AuthContext";
 const Login = () => {
   const [login, setLogin] = useState({ email: "", password: "" });
+  const { authState, setAuthState, verifyUser } = useContext(AuthContext);
   const handler = (e) => {
     setLogin((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -10,9 +12,9 @@ const Login = () => {
     e.preventDefault();
     try {
       const { data } = await Axios.post("/auth/login", login);
-      if (data.status) {
-        console.log(data);
+      if (data.success) {
         alert(data.message);
+        verifyUser();
       } else {
         alert(data.message);
       }

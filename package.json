@@ -1,8 +1,26 @@
 {
+  "name": "chat-app1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "frontend": "cd frontend && npm run dev",
+    "backend": "cd backend && npm start",
+    "start": "concurrently \"npm run frontend\" \"npm run backend\" "
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yogeshsingh-1/Mern-Chat-App.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/yogeshsingh-1/Mern-Chat-App/issues"
+  },
+  "homepage": "https://github.com/yogeshsingh-1/Mern-Chat-App#readme",
   "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
-    "@mui/icons-material": "^7.3.9",
-    "@mui/material": "^7.3.9"
+    "concurrently": "^9.2.1"
   }
 }
