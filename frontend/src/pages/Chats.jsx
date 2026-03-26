@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Axios from "../utils/axiox.utils";
 import Chat from "../components/Chat";
+import { TextField, InputAdornment } from "@mui/material";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import Search from "@mui/icons-material/Search";
+import ChatBar from "../components/ChatBar";
 const data = [
   {
     name: "yogesh singh",
@@ -35,15 +39,40 @@ const Chats = () => {
   if (view) {
     return <p>Loading...</p>;
   }
-  // return <div>{JSON.stringify(user)}</div>;
+
   return (
     <div className="max-w-5xl w-full mx-auto my-5 shadow-md rounded-md bg-white min-h-[80vh] p-4 flex gap-3  ">
-      <div className="w-[30%] bg-zinc-400 rounded-md p-3 flex flex-col gap-3 ">
+      <div className="w-[25%] rounded-md  flex flex-col gap-3 ">
+      
+        <TextField
+          id="input-with-icon-textfield"
+          placeholder="Seacrh..."
+          size="small"
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search className="text-xl! text-zinc-400 bg-transparent!" />
+                </InputAdornment>
+              ),
+            },
+          }}
+          variant="outlined"
+          sx={{
+            "& input::placeholder": {
+              fontSize: "13px",
+              backgroundColor: "transparent",
+            },
+          }}
+        />
+
         {users.map((user) => (
-          <Chat user={user}/>
+          <Chat user={user} />
         ))}
       </div>
-      <div className="flex-1 bg-red-300 rounded-md">hi</div>
+      {/* chatbar */}
+      <ChatBar />
+      {/* <div className="flex-1 bg-red-300 rounded-md">hi</div> */}
     </div>
   );
 };
