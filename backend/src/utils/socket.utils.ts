@@ -30,3 +30,19 @@ io.on("connection", (socket) => {
     io.to(data.roomId).emit("rec-msg", data.msg);
   });
 });
+
+// io.on("connection", (socket) => {
+//   // const userId = socket.user.id;
+
+//   // user apne room me join karega
+//   // socket.join("join-remoo");
+
+//   // console.log(`User connected: ${userId}`);
+
+//   socket.on("sendMessage", ({ toUserId, message }) => {
+//     io.to(toUserId).emit("receiveMessage", {
+//       from: userId,
+//       message,
+//     });
+//   });
+// });

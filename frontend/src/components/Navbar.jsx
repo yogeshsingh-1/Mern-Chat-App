@@ -27,6 +27,12 @@ const Navbar = () => {
         <div className="flex justify-end gap-10 items-center px-10">
           <div className="flex items-center gap-1.5 ">
             <div className="h-2 w-2 rounded-full bg-green-500"></div>
+            <div
+              className="text-[12.5px] font-semibold text-green-600 cursor-pointer"
+              onClick={() => navigate("/chat")}
+            >
+              Chat
+            </div>
             <div className="text-[12.5px] font-semibold text-green-600">
               Online
             </div>

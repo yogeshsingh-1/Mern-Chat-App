@@ -12,7 +12,7 @@ const AppRoutes = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
-    errorElement: <ErrorBoundary />,
+    // errorElement: <ErrorBoundary />,
     children: [
       { index: true, element: <Home /> },
       {

@@ -4,7 +4,7 @@ import Axios from "../utils/axiox.utils";
 import { AuthContext } from "../auth/AuthContext";
 const Signup = () => {
   const [signup, setSignup] = useState({ name: "", email: "", password: "" });
-  const { authState, setAuthState, verifyUser } = useContext(AuthContext);
+  const { verifyUser } = useContext(AuthContext);
   const handler = (e) => {
     setSignup((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };

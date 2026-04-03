@@ -1,78 +1,184 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Axios from "../utils/axiox.utils";
-import Chat from "../components/Chat";
 import { TextField, InputAdornment } from "@mui/material";
-import AccountCircle from "@mui/icons-material/AccountCircle";
 import Search from "@mui/icons-material/Search";
 import ChatBar from "../components/ChatBar";
-const data = [
-  {
-    name: "yogesh singh",
-    email: "yogeshs368@gmail.com",
-  },
-  { name: "yogesh singh", email: "jai.gupta@gmail.com" },
-  { name: "yogesh singh", email: "nitin@gmail.com" },
-  { name: "yogesh singh", email: "abbas@gmail.com" },
-  { name: "yogesh singh", email: "ravi@gmail.com" },
-  { name: "yogesh singh", email: "kartika@gmail.com" },
-];
+import getSocket from "../utils/socket.utils";
+import { AuthContext } from "../auth/AuthContext";
+// const chats = {
+//   user2: [
+//     { from: "me", message: "Hello 😄" },
+//     { from: "user2", message: "Hi bhai" },
+//   ],
+//   user3: [{ from: "user3", message: "Hey!" }],
+// };
 const Chats = () => {
-  const [view, setView] = useState(true);
-  const [users, setUsers] = useState(data);
-  const allUsers = async () => {
+  const { id } = useContext(AuthContext);
+  const socket = getSocket();
+  const [search, setSearch] = useState("");
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState([]);
+  const [chats, setChats] = useState({});
+  const [chatUser, setChatUser] = useState(null);
+  //  Fetch Users
+  const fetchUsers = async (value) => {
     try {
-      const { data } = await Axios.get("/api/v1/user/all");
-      console.log(data);
+      const { data } = await Axios.post("/api/v1/user", {
+        search: value,
+      });
       if (data.success) {
-        setView(false);
-        // setUsers(data?.data);
+        setUsers(data.data || []);
       } else {
-        alert(data.message);
+        setUsers([]);
       }
     } catch (error) {
-      alert(error.response?.data?.message);
+      console.error(error);
+      setUsers([]);
     }
   };
+
+  //  Debounce
   useEffect(() => {
-    allUsers();
+    if (!search) {
+      setUsers([]);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      fetchUsers(search);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+  useEffect(() => {
+    socket.on("receiveMessage", (data) => {
+      console.log("New message:", data);
+    });
+
+    return () => {
+      socket.off("receiveMessage");
+    };
   }, []);
-  if (view) {
-    return <p>Loading...</p>;
-  }
-
+  //  Add selected user
+  const createSelectedUser = (user) => {
+    const exist = selectedUser.find((u) => u.id === user.id);
+    if (!exist) {
+      setSelectedUser((prev) => [...prev, user]);
+    }
+    setUsers([]);
+    setSearch("");
+  };
+  const setChatsForUser = (id) => {
+    setChats((prev) => ({ ...prev, id: [] }));
+    setChatUser({ [id]: chats.id });
+  };
   return (
-    <div className="max-w-5xl w-full mx-auto my-5 shadow-md rounded-md bg-white min-h-[80vh] p-4 flex gap-3  ">
-      <div className="w-[25%] rounded-md  flex flex-col gap-3 ">
-      
-        <TextField
-          id="input-with-icon-textfield"
-          placeholder="Seacrh..."
-          size="small"
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search className="text-xl! text-zinc-400 bg-transparent!" />
-                </InputAdornment>
-              ),
-            },
-          }}
-          variant="outlined"
-          sx={{
-            "& input::placeholder": {
-              fontSize: "13px",
-              backgroundColor: "transparent",
-            },
-          }}
-        />
+    <div className="max-w-6xl w-full mx-auto my-6 shadow-2xl rounded-2xl bg-white h-[80vh] flex overflow-hidden border">
+      {/*  Sidebar */}
+      <div className="w-[30%] bg-gradient-to-b from-zinc-50 to-zinc-100 border-r flex flex-col">
+        {/* Header */}
+        <div className="p-4 font-semibold text-lg border-b bg-white">
+          Messages
+        </div>
 
-        {users.map((user) => (
-          <Chat user={user} />
-        ))}
+        {/*  Search */}
+        <div className="p-3">
+          <TextField
+            placeholder="Search users..."
+            size="small"
+            fullWidth
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search className="text-zinc-400" />
+                  </InputAdornment>
+                ),
+              },
+            }}
+            sx={{
+              backgroundColor: "#fff",
+              borderRadius: "10px",
+            }}
+          />
+        </div>
+
+        {/*  Search Results */}
+        {search && (
+          <div className="px-2 space-y-1 max-h-40 overflow-y-auto">
+            {users.length ? (
+              users.map((user) => (
+                <div
+                  key={user.id}
+                  onClick={() => createSelectedUser(user)}
+                  className="flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-blue-100 transition"
+                >
+                  {/* Avatar */}
+                  <div className="w-9 h-9 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold">
+                    {user.name?.charAt(0).toUpperCase()}
+                  </div>
+
+                  {/* Info */}
+                  <div>
+                    <p className="text-sm font-medium">{user.name}</p>
+                    <p className="text-xs text-gray-500">{user.email}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-center text-gray-400">
+                No users found
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Selected Users */}
+        <div className="flex-1 overflow-y-auto mt-3 px-2">
+          <p className="text-xs text-gray-500 px-2 mb-2">Selected Chats</p>
+
+          {selectedUser.length ? (
+            selectedUser.map((user) => (
+              <div
+                key={user.id}
+                className="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-200 cursor-pointer transition"
+                onClick={() => setChatsForUser(user.id)}
+              >
+                {/* Avatar */}
+                <div className="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold">
+                  {user.name?.charAt(0).toUpperCase()}
+                </div>
+
+                {/* Info */}
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{user.name}</p>
+                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-center text-gray-400 mt-4">
+              No chats yet
+            </p>
+          )}
+        </div>
       </div>
-      {/* chatbar */}
-      <ChatBar />
-      {/* <div className="flex-1 bg-red-300 rounded-md">hi</div> */}
+
+      {/*  Chat Area */}
+      <div className="flex-1 flex flex-col bg-zinc-50">
+        {chatUser ? (
+          <ChatBar selectedUser={chatUser} />
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-zinc-400">
+            <p className="text-lg">👋 Welcome</p>
+            <p className="text-sm">
+              Search and select a user to start chatting
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
