@@ -8,6 +8,7 @@ import SingleChat from "../pages/SingleChat";
 import AuthLayout from "../layout/AuthLayout";
 import ErrorBoundary from "../components/ErrorBoundary";
 import ChatLayout from "../layout/ChatLayout";
+import Chat1 from "../pages/Chat1";
 const AppRoutes = createBrowserRouter([
   {
     path: "/",
@@ -22,7 +23,8 @@ const AppRoutes = createBrowserRouter([
           {
             element: <ChatLayout />,
             children: [
-              { index: true, element: <Chats /> },
+              // { index: true, element: <Chats /> },
+              { index: true, element: <Chat1 /> },
               { path: ":id", element: <SingleChat /> },
             ],
           },
