@@ -23,7 +23,7 @@ const Chat1 = () => {
         <div className="flex-1 py-1 px-2 overflow-auto scroll-smooth ">
           {users.length ? (
             users.map((user, index) => (
-              <div className=" rounded-md px-2 py-2  flex items-center gap-2.5 hover:bg-gray-200 transaction-dura mt-1 hover:shadow-md">
+              <div className=" rounded-md px-2 py-2  flex items-center gap-2.5 hover:bg-gray-200/50  mt-1 hover:shadow-md duration-100">
                 <div className="">
                   <Avatar className="bg-blue-600!">{user.name[0]}</Avatar>
                 </div>
