@@ -3,6 +3,7 @@ import Axios from "../utils/axiox.utils";
 import { TextField, InputAdornment } from "@mui/material";
 import Search from "@mui/icons-material/Search";
 import ChatBar from "../components/ChatBar";
+import SingleChat from "./SingleChat";
 import getSocket from "../utils/socket.utils";
 import { AuthContext } from "../auth/AuthContext";
 // const chats = {
@@ -16,10 +17,15 @@ const Chats = () => {
   const { id } = useContext(AuthContext);
   const socket = getSocket();
   const [search, setSearch] = useState("");
+  // all users from search
   const [users, setUsers] = useState([]);
+  // selected user for chat
   const [selectedUser, setSelectedUser] = useState([]);
+  // all chats
   const [chats, setChats] = useState({});
-  const [chatUser, setChatUser] = useState(null);
+  // current chat user id
+  const [currentChatId, setCurrentId] = useState(null);
+  // const [chatUser, setChatUser] = useState(null);
   //  Fetch Users
   const fetchUsers = async (value) => {
     try {
@@ -36,7 +42,7 @@ const Chats = () => {
       setUsers([]);
     }
   };
-
+  // console.log(selectedUser);
   //  Debounce
   useEffect(() => {
     if (!search) {
@@ -64,14 +70,18 @@ const Chats = () => {
     const exist = selectedUser.find((u) => u.id === user.id);
     if (!exist) {
       setSelectedUser((prev) => [...prev, user]);
+      setChats((prev) => ({ ...prev, [user.id]: [] }));
     }
     setUsers([]);
     setSearch("");
   };
-  const setChatsForUser = (id) => {
-    setChats((prev) => ({ ...prev, id: [] }));
-    setChatUser({ [id]: chats.id });
-  };
+  console.log(chats);
+  // set Current Chat user
+  // const setChatsForUser = (id) => {
+  //   // setChatUser(selectedUser.find((u) => u.id === id));
+  //   setChats((prev) => ({ ...prev, [id]: prev[id] || [] }));
+  // };
+  // console.log("hi", chats[currentChatId].length);
   return (
     <div className="max-w-6xl w-full mx-auto my-6 shadow-2xl rounded-2xl bg-white h-[80vh] flex overflow-hidden border">
       {/*  Sidebar */}
@@ -142,9 +152,9 @@ const Chats = () => {
           {selectedUser.length ? (
             selectedUser.map((user) => (
               <div
+                onClick={() => setCurrentId(user.id)}
                 key={user.id}
                 className="flex items-center gap-3 p-2 rounded-lg hover:bg-zinc-200 cursor-pointer transition"
-                onClick={() => setChatsForUser(user.id)}
               >
                 {/* Avatar */}
                 <div className="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold">
@@ -168,8 +178,11 @@ const Chats = () => {
 
       {/*  Chat Area */}
       <div className="flex-1 flex flex-col bg-zinc-50">
-        {chatUser ? (
-          <ChatBar selectedUser={chatUser} />
+        {chats[currentChatId] ? (
+          <SingleChat
+            selectedUser={selectedUser.find((u) => u.id === currentChatId)}
+            chatData={chats[currentChatId]}
+          />
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-zinc-400">
             <p className="text-lg">👋 Welcome</p>

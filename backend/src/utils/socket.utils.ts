@@ -20,14 +20,14 @@ import { io } from "../index.js";
 // })
 
 io.on("connection", (socket) => {
-  // console.log(socket.id)
-  // socket.emit("msg", "<br/>Bhai msg aaya hai");
+  console.log(socket.id)
   socket.on("join-room", (roomId) => socket.join(roomId));
-  // socket.on("send-message", (data) =>
-  //   io.to(data.roomId).
-  // );
+
   socket.on("send-message", (data) => {
-    io.to(data.roomId).emit("rec-msg", data.msg);
+    console.log(data)
+    io.to(data.roomId).emit("rec-msg", {
+      roomId: data.roomId, msg: data.msg
+    });
   });
 });
 

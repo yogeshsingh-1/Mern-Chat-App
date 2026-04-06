@@ -1,11 +1,13 @@
-import { useEffect, useRef, useState } from "react";
-
-const ChatBar = ({ selectedUser }) => {
+import { useEffect, useRef, useState, useContext } from "react";
+import { AuthContext } from "../auth/AuthContext";
+const ChatBar = ({ selectedUser, chatData }) => {
+  const { id } = useContext(AuthContext);
   const [messages, setMessages] = useState([
     { text: "Hi Yogesh", sender: "me", time: "10:00 AM" },
     { text: "Hello Jai", sender: "other", time: "10:01 AM" },
   ]);
-
+  console.log(chatData);
+  console.log(selectedUser);
   const [input, setInput] = useState("");
   const bottomRef = useRef(null);
 
@@ -26,7 +28,7 @@ const ChatBar = ({ selectedUser }) => {
 
     setMessages((prev) => [
       ...prev,
-      { text: input, sender: "me", time: getTime() },
+      { text: input, sender: id, time: getTime() },
     ]);
     setInput("");
   };
@@ -45,11 +47,11 @@ const ChatBar = ({ selectedUser }) => {
 
       {/* Chat Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((msg, index) => (
+        {chatData.map((msg, index) => (
           <div
             key={index}
             className={`flex ${
-              msg.sender === "me" ? "justify-end" : "justify-start"
+              msg.sender === id ? "justify-end" : "justify-start"
             }`}
           >
             <div className="flex flex-col max-w-xs">
