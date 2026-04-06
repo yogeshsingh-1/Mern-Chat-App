@@ -69,13 +69,13 @@ const message = [
 
 const left = "self-start bg-white text-gray-800 rounded-tl-lg";
 const right = "self-end bg-emerald-600 text-white rounded-br-lg";
+const socket = getSocket();
 const Chat1 = () => {
-  const socket = getSocket();
   const { id } = useContext(AuthContext);
   const [activeId, setActiveId] = useState(null);
   const [input, setInput] = useState("");
   const [text, setText] = useState(false);
-  const [search, setSearch] = useState(null);
+  const [search, setSearch] = useState("");
   // search-user
   const [searchUser, setSearchUser] = useState([]);
   // All selected Users
@@ -143,6 +143,22 @@ const Chat1 = () => {
       });
     });
   });
+  useEffect(() => {
+    const handler = (data) => {
+      console.log("msg received:", data);
+    };
+
+    socket.on("msg", handler);
+
+    return () => {
+      socket.off("msg", handler);
+    };
+  }, []);
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log("Connected:", socket.id);
+    });
+  }, []);
   return (
     <div className="max-w-[80vw] w-full mx-auto bg-white mt-6 flex h-[80vh] rounded-lg shadow-xl overflow-hidden">
       {/* left */}

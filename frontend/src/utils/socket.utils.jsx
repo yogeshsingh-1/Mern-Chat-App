@@ -6,10 +6,11 @@ let socket = null;
 const getSocket = () => {
   if (!socket) {
     socket = io("http://localhost:5000", {
-      autoConnect: false,
+      // autoConnect: false,
       transports: ["websocket"],
     });
   }
+
   return socket;
 };
 

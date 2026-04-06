@@ -21,12 +21,16 @@ import { io } from "../index.js";
 
 io.on("connection", (socket) => {
   console.log(socket.id)
+  setInterval(() => {
+    io.emit("msg", "hello bhai");
+  }, 1000);
   socket.on("join-room", (roomId) => socket.join(roomId));
 
   socket.on("send-message", (data) => {
-    console.log(data)
     io.to(data.roomId).emit("rec-msg", {
-      roomId: data.roomId, msg: data.msg
+      roomId: data.roomId,
+      msg: data.msg,
+      senderId: socket.id
     });
   });
 });
