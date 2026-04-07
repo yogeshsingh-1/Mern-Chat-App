@@ -233,7 +233,7 @@ const Chat1 = () => {
               chatUser[getRoomId(id, activeId.id)].map((msg, index) => {
                 return (
                   <div
-                    className={`max-w-[60%] w-fit py-1 px-2  border flex gap-3  ${msg.from === id ? right : left}`}
+                    className={`max-w-[60%] w-fit py-1 px-2  border flex gap-3 shadow-2xl ${msg.from === id ? right : left}`}
                     key={index}
                   >
                     <div className=" text-sm ">{msg.msg}</div>
@@ -269,6 +269,11 @@ const Chat1 = () => {
                   //   roomId: getRoomId(id, activeId.id),
                   //   recId: activeId.id,
                   // });
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSendMessage();
+                  }
                 }}
                 required
               />
