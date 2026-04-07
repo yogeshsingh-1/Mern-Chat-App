@@ -1,75 +1,17 @@
 import { Button, TextField, Avatar } from "@mui/material";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import Axios from "../utils/axiox.utils";
 import { AuthContext } from "../auth/AuthContext";
 import getSocket from "../utils/socket.utils";
-// const users = [
-//   { name: "yogesh", email: "yogesh@gmail.com" },
-//   { name: "mohini", email: "mohini@gmail.com" },
-//   { name: "ram", email: "ram@gmail.com" },
-//   { name: "hari", email: "hari@gmail.com" },
-//   { name: "yashi", email: "yashi@gmail.com" },
-//   { name: "karan", email: "karan@gmail.com" },
-//   { name: "pankaj", email: "pankaj@gmail.com" },
-//   //   { name: "jyoti", email: "jyoti@gmail.com" },
-// ];
-const message = [
-  {
-    user: "yogesh",
-    text: "Hello, how are you?",
-  },
-  {
-    user: "mohini",
-    text: "I'm doing well, thank you! How about you?",
-  },
-  {
-    user: "yogesh",
-    text: "I'm good too, thanks for asking!",
-  },
-  { user: "mohini", text: "What are you up to today?" },
-  {
-    user: "yogesh",
-    text: "Not much, just working on some projects. How about you?",
-  },
-  {
-    user: "mohini",
-    text: "Same here, just trying to stay productive. Do you have any plans for the weekend?",
-  },
-  // {
-  //   user: "yogesh",
-  //   text: "Not yet, but I'm thinking about going hiking. How about you?",
-  // },
-  // {
-  //   user: "mohini",
-  //   text: "That sounds like a great idea! I might join you if the weather is nice.",
-  // },
-  // {
-  //   user: "yogesh",
-  //   text: "Sure, that would be fun! Let's keep in touch and see how the weather looks closer to the weekend.",
-  // },
-  // {
-  //   user: "mohini",
-  //   text: "Sounds good! Looking forward to it.",
-  // },
-  // { user: "yogesh", text: "I'm excited about it too!" },
-  // {
-  //   user: "mohini",
-  //   text: "That sounds like a great idea! I might join you if the weather is nice.",
-  // },
-  // {
-  //   user: "yogesh",
-  //   text: "Sure, that would be fun! Let's keep in touch and see how the weather looks closer to the weekend.",
-  // },
-  // {
-  //   user: "mohini",
-  //   text: "Sounds good! Looking forward to it.",
-  // },
-  // { user: "yogesh", text: "I'm excited about it too!" },
-];
 
+// roomId is commbination of userA and userB
+function getRoomId(userA, userB) {
+  return [userA.toString(), userB.toString()].sort().join("_");
+}
 const left = "self-start bg-white text-gray-800 rounded-tl-lg";
 const right = "self-end bg-emerald-600 text-white rounded-br-lg";
 const socket = getSocket();
+
 const Chat1 = () => {
   const { id } = useContext(AuthContext);
   const [activeId, setActiveId] = useState(null);
@@ -114,51 +56,78 @@ const Chat1 = () => {
   }, [search]);
   // select active chat user
   const selectUser = (user) => {
-    // if users null/undefined than we add in users
+    const roomId = getRoomId(id, user.id);
+    socket.emit("join-room", roomId);
+
     users.find((s) => s.id === user.id) ?? setUsers((prev) => [...prev, user]);
+    // setActiveId(user);
     setSearch("");
   };
-  const setSeacrhInput = () => {
-    console.log(activeId);
-    setChatUser((prev) => {
-      const prevChat = prev[activeId.id];
+  // event for send msg
+  const handleSendMessage = () => {
+    if (!input.trim() || !activeId) return;
 
-      return prevChat
-        ? { ...prev, [activeId.id]: [...prevChat, { [activeId.id]: input }] }
-        : { ...prev, [activeId.id]: [{ [activeId.id]: input }] };
+    const roomId = getRoomId(id, activeId.id);
+    const message = {
+      from: id,
+      msg: input.trim(),
+    };
+
+    // emit to server
+    socket.emit("send-message", {
+      roomId,
+      senderId: id,
+      msg: message.msg,
+      time: new Date().toTimeString().split(" ")[0],
     });
-    socket.emit("send-message", { roomId: activeId.id, msg: input });
+
+    // 2. clear input
     setInput("");
   };
-  useEffect(() => {
-    socket.on("rec-msg", (data) => {
-      setChatUser((prev) => {
-        const prevChat = prev[data.roomId];
-        return prevChat
-          ? {
-              ...prev,
-              [data.roomId]: [...prevChat, { [data.roomId]: data.msg }],
-            }
-          : { [data.roomId]: [{ [data.roomId]: data.msg }] };
-      });
-    });
-  });
+  // event for rec msg
+  // server controlled
   useEffect(() => {
     const handler = (data) => {
-      console.log("msg received:", data);
+      setChatUser((prev) => {
+        const prevChat = prev[data.roomId];
+
+        return {
+          ...prev,
+          [data.roomId]: prevChat
+            ? [
+                ...prevChat,
+                {
+                  from: data.senderId,
+                  msg: data.msg,
+                  time: new Date().toTimeString().split(" ")[0],
+                },
+              ]
+            : [
+                {
+                  from: data.senderId,
+                  msg: data.msg,
+                  time: new Date().toTimeString().split(" ")[0],
+                },
+              ],
+        };
+      });
     };
-
-    socket.on("msg", handler);
-
+    socket.on("rec-msg", handler);
+    // socket.on("typing", (data) => {});
     return () => {
-      socket.off("msg", handler);
+      socket.off("rec-msg", handler);
     };
   }, []);
+  // useEffect(() => {
+  // socket.emit("join-room", id);
+  // disconnected logic for room
+  //   return;
+  // }, []);
+  const bottomRef = useRef(null);
+
   useEffect(() => {
-    socket.on("connect", () => {
-      console.log("Connected:", socket.id);
-    });
-  }, []);
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatUser]);
   return (
     <div className="max-w-[80vw] w-full mx-auto bg-white mt-6 flex h-[80vh] rounded-lg shadow-xl overflow-hidden">
       {/* left */}
@@ -174,10 +143,10 @@ const Chat1 = () => {
           />
           <div className="flex-1 py-1 px-2 overflow-auto">
             {searchUser.length ? (
-              searchUser.map((user, index) => (
+              searchUser.map((user) => (
                 <div
                   className=" rounded-md px-2 py-2  flex items-center gap-2.5 hover:bg-gray-200/50  mt-1 hover:shadow-md duration-100 cursor-pointer"
-                  key={index}
+                  key={user.id}
                   onClick={() => selectUser(user)}
                 >
                   <div className="">
@@ -221,7 +190,6 @@ const Chat1 = () => {
                       ),
                     );
                     setActiveId(user);
-                    socket.emit("join-room", user.id);
                   }}
                 >
                   <div className="">
@@ -253,24 +221,28 @@ const Chat1 = () => {
         {activeId && (
           <div className="border-b py-3 px-3 flex items-center gap-3">
             <Avatar className="size-8!">{activeId.name[0]}</Avatar>
-            <h3 className="text-md font-semibold">{activeId.name}</h3>
+            <h3 className="text-md font-semibold">
+              {activeId.name}-{activeId.id}
+            </h3>
           </div>
         )}
         {/* right-center */}
         {activeId ? (
           <div className="flex-1 px-4 py-2 flex flex-col gap-1.5 overflow-auto">
-            {chatUser[activeId.id]
-              ? chatUser[activeId.id].map((msg, index) => {
-                  return (
-                    <div
-                      className={`py-2.5 px-2 text-xs font-medium  border  ${msg.id === id ? left : right}`}
-                      key={index}
-                    >
-                      {msg.id === id ? msg[id] : msg[activeId.id]}
+            {chatUser[getRoomId(id, activeId.id)] &&
+              chatUser[getRoomId(id, activeId.id)].map((msg, index) => {
+                return (
+                  <div
+                    className={`max-w-[60%] w-fit py-1 px-2  border flex gap-3  ${msg.from === id ? right : left}`}
+                    key={index}
+                  >
+                    <div className=" text-sm ">{msg.msg}</div>
+                    <div className="text-[8px] text-gray-600 self-end font-medium">
+                      {msg.time}
                     </div>
-                  );
-                })
-              : ""}
+                  </div>
+                );
+              })}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-zinc-400">
@@ -291,13 +263,19 @@ const Chat1 = () => {
                 type="text"
                 size="small"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  // socket.emit("typing", {
+                  //   roomId: getRoomId(id, activeId.id),
+                  //   recId: activeId.id,
+                  // });
+                }}
                 required
               />
               <Button
                 variant="contained"
                 type="submit"
-                onClick={setSeacrhInput}
+                onClick={handleSendMessage}
               >
                 Send
               </Button>
