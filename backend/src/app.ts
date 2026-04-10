@@ -5,7 +5,6 @@ import userRouter from "./routes/user.routes.js";
 import errorHandleMiddleware from "./middlewares/error.middleware.js";
 import authMiddleware from "./middlewares/auth.middleware.js";
 import verifyRoute from "./routes/verify.routes.js"
-import { Request, Response, NextFunction } from "express";
 const port = process.env.port || 5000;
 
 app.use("/", authRouter);

@@ -68,16 +68,11 @@ const Chat1 = () => {
     if (!input.trim() || !activeId) return;
 
     const roomId = getRoomId(id, activeId.id);
-    const message = {
-      from: id,
-      msg: input.trim(),
-    };
-
     // emit to server
     socket.emit("send-message", {
       roomId,
       senderId: id,
-      msg: message.msg,
+      msg: input.trim(),
       time: new Date().toTimeString().split(" ")[0],
     });
 
@@ -179,15 +174,17 @@ const Chat1 = () => {
             {users.length ? (
               users.map((user) => (
                 <div
-                  className={`rounded-md px-2 py-2  flex items-center gap-2.5 hover:bg-gray-200/50  mt-1 hover:shadow-md  cursor-pointer ${user.isActive ? "bg-gray-200/50" : null}`}
+                  className={`rounded-md px-2 py-2  flex items-center gap-2.5 hover:bg-gray-200/50  mt-1 hover:shadow-md  cursor-pointer ${
+                    user.isActive ? "bg-gray-200/50" : null
+                  }`}
                   key={user.id}
                   onClick={() => {
                     setUsers((prev) =>
                       prev.map((u) =>
                         u.id === user.id
                           ? { ...u, isActive: true }
-                          : { ...u, isActive: false },
-                      ),
+                          : { ...u, isActive: false }
+                      )
                     );
                     setActiveId(user);
                   }}
@@ -233,7 +230,9 @@ const Chat1 = () => {
               chatUser[getRoomId(id, activeId.id)].map((msg, index) => {
                 return (
                   <div
-                    className={`max-w-[60%] w-fit py-1 px-2  border flex gap-3 shadow-2xl ${msg.from === id ? right : left}`}
+                    className={`max-w-[60%] w-fit py-1 px-2  border flex gap-3 shadow-2xl ${
+                      msg.from === id ? right : left
+                    }`}
                     key={index}
                   >
                     <div className=" text-sm ">{msg.msg}</div>
