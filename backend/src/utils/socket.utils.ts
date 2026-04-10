@@ -29,7 +29,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("send-message", (data) => {
-    console.log(data)
+    console.log(data);
     io.to(data.roomId).emit("rec-msg", {
       roomId: data.roomId,
       msg: data.msg,
@@ -38,6 +38,12 @@ io.on("connection", (socket) => {
   });
   socket.on("typing", (data) => {
     io.to(data.roomId).emit("typing", {
+      roomId: data.roomId,
+      recId: data.recId,
+    });
+  });
+  socket.on("stop-typing", (data) => {
+    io.to(data.roomId).emit("stop-typing", {
       roomId: data.roomId,
       recId: data.recId,
     });

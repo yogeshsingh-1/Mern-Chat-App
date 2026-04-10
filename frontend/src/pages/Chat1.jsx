@@ -14,6 +14,7 @@ const socket = getSocket();
 
 const Chat1 = () => {
   const { id } = useContext(AuthContext);
+  const [typing, setTyping] = useState({});
   const [activeId, setActiveId] = useState(null);
   const [input, setInput] = useState("");
   const [text, setText] = useState(false);
@@ -107,17 +108,32 @@ const Chat1 = () => {
         };
       });
     };
+    const startTyping = (data) => {
+      setTyping((prev) => ({ [data.roomId]: true, recId: data.recId }));
+    };
+    const stopTyping = (data) => {
+      setTyping((prev) => ({ [data.roomId]: false, recId: data.recId }));
+    };
     socket.on("rec-msg", handler);
-    // socket.on("typing", (data) => {});
+    socket.on("typing", startTyping);
+    socket.on("stop-typing", stopTyping);
     return () => {
       socket.off("rec-msg", handler);
+      socket.off("typing", startTyping);
+      socket.off("stop-typing", stopTyping);
     };
   }, []);
-  // useEffect(() => {
-  // socket.emit("join-room", id);
-  // disconnected logic for room
-  //   return;
-  // }, []);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      socket.emit("stop-typing", {
+        roomId: getRoomId(id, activeId?.id),
+        senderId: id,
+      });
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+  }, [input]);
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -219,7 +235,8 @@ const Chat1 = () => {
           <div className="border-b py-3 px-3 flex items-center gap-3">
             <Avatar className="size-8!">{activeId.name[0]}</Avatar>
             <h3 className="text-md font-semibold">
-              {activeId.name}-{activeId.id}
+              {activeId.name} 
+              {/* <span>{typing[getRoomId(id,activeId.id)]  }</span> */}
             </h3>
           </div>
         )}
@@ -264,10 +281,10 @@ const Chat1 = () => {
                 value={input}
                 onChange={(e) => {
                   setInput(e.target.value);
-                  // socket.emit("typing", {
-                  //   roomId: getRoomId(id, activeId.id),
-                  //   recId: activeId.id,
-                  // });
+                  socket.emit("typing", {
+                    roomId: getRoomId(id, activeId.id),
+                    recId: activeId.id,
+                  });
                 }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
